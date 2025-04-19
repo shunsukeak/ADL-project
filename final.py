@@ -18,6 +18,7 @@ disaster_osm_map = {
     # "woolsey-fire": {"bbox": (-118.9960, 34.0196, -118.7576, 34.2415), "pbf": ["california-latest.osm.pbf"]},
     # "tuscaloosa-tornado": {"bbox": (-87.5648, 33.1583, -87.3877, 33.2778), "pbf": ["alabama-latest.osm.pbf"]},
     # "moore-tornado": {"bbox": (-97.5500, 35.3009, -97.4137, 35.3560), "pbf": ["oklahoma-latest.osm.pbf"]},
+    
     # "mexico-earthquake": {"bbox": (-99.2329, 19.2392, -99.1362, 19.4326), "pbf": ["mexico-latest.osm.pbf"]},
     # "portugal-wildfire": {"bbox": (-8.3133, 39.7677, -8.0698, 40.0370), "pbf": ["portugal-latest.osm.pbf"]},
     # "nepal-flooding": {"bbox": (83.2554, 26.4630, 83.5837, 26.9925), "pbf": ["nepal-latest.osm.pbf"]},

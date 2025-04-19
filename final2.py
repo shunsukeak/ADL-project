@@ -42,11 +42,14 @@ def process_disaster_buildings(disaster, bbox_tuple, pbf_files, output_dir="./ne
 
 
 # テスト例（メモリ負荷軽減のため1災害ずつにする）
-test_disaster = "sunda-tsunami"
-test_bbox = (105.8030, -6.7987, 105.8692, -6.1938)
-test_pbf_files = ["sumatra-latest.osm.pbf", "java-latest.osm.pbf"]
+# test_disaster = "sunda-tsunami"
+# test_bbox = (105.8030, -6.7987, 105.8692, -6.1938)
+# test_pbf_files = ["sumatra-latest.osm.pbf", "java-latest.osm.pbf"]
 
+test_disaster = "pinery-bushfire"
+test_bbox = (138.6891, -34.5462, 138.9288, -34.2226)
+test_pbf_files = ["australia-latest.osm.pbf"]
 process_disaster_buildings(test_disaster, test_bbox, test_pbf_files)
 
 # "sunda-tsunami": {"bbox": (105.8030, -6.7987, 105.8692, -6.1938), "pbf": ["sumatra-latest.osm.pbf", "java-latest.osm.pbf"]},
-
+# "pinery-bushfire": {"bbox": (138.6891, -34.5462, 138.9288, -34.2226), "pbf": ["australia-latest.osm.pbf"]},
