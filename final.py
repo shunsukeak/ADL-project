@@ -22,11 +22,11 @@ disaster_osm_map = {
     # "portugal-wildfire": {"bbox": (-8.3133, 39.7677, -8.0698, 40.0370), "pbf": ["portugal-latest.osm.pbf"]},
     # "nepal-flooding": {"bbox": (83.2554, 26.4630, 83.5837, 26.9925), "pbf": ["nepal-latest.osm.pbf"]},
     
-    "guatemala-volcano": {"bbox": (-90.8852, 14.3564, -90.8003, 14.4486), "pbf": ["guatemala-latest.osm.pbf"]},
+    # "guatemala-volcano": {"bbox": (-90.8852, 14.3564, -90.8003, 14.4486), "pbf": ["guatemala-latest.osm.pbf"]},
+    "palu-tsunami": {"bbox": (119.7885, -1.0042, 119.9348, -0.6888), "pbf": ["sulawesi-latest.osm.pbf"]},
+    "hurricane-matthew": {"bbox": (-74.1915, 18.1516, -73.4953, 18.6823), "pbf": ["haiti-and-domrep-latest.osm.pbf, jamaica-latest.osm.pbf"]},
+    "sunda-tsunami": {"bbox": (105.8030, -6.7987, 105.8692, -6.1938), "pbf": ["sumatra-latest.osm.pbf", "java-latest.osm.pbf"]},
     "pinery-bushfire": {"bbox": (138.6891, -34.5462, 138.9288, -34.2226), "pbf": ["australia-latest.osm.pbf"]},
-    "hurricane-matthew": {"bbox": (-74.1915, 18.1516, -73.4953, 18.6823), "pbf": ["central-america-latest.osm.pbf"]},
-    "sunda-tsunami": {"bbox": (105.8030, -6.7987, 105.8692, -6.1938), "pbf": ["indonesia-latest.osm.pbf"]},
-    "palu-tsunami": {"bbox": (119.7885, -1.0042, 119.9348, -0.6888), "pbf": ["indonesia-latest.osm.pbf"]}
 }
 print("Create dir", flush=True)
 output_dir = "./new/output/osm_extracted_csv"
