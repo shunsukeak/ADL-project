@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 # CSVファイルが格納されているフォルダのパスを指定
-folder_path = "./your_folder_name"  # 適宜変更してください
+folder_path = "./output"  # 適宜変更してください
 
 # 行数を数えるオプション
 include_header = False  # ヘッダーを含めないなら False
