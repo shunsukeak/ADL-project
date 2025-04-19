@@ -1,0 +1,4 @@
+https://download.geofabrik.de/asia/indonesia-latest.osm.pbf
+https://download.geofabrik.de/asia/nepal-latest.osm.pbf
+https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf
+https://download.geofabrik.de/central-america-latest.osm.pbf
