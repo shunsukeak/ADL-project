@@ -5,6 +5,17 @@ import os
 import time
 import pandas as pd
 
+tags_to_check = [
+    "building",
+    "building:material",
+    "building:levels",
+    "building:use",
+    "height",
+    "roof:shape",
+    "roof:material",
+    "addr:city",
+    "name"
+]
 # 災害名とbbox、対応する1つ以上の.pbfファイルリスト（すでに定義済）
 disaster_osm_map = {
     "santa-rosa-wildfire": {"bbox": (-122.7905, 38.4006, -122.6312, 38.5670), "pbf": ["california-latest.osm.pbf"]},
@@ -48,7 +59,7 @@ for disaster, info in disaster_osm_map.items():
             osm = OSM(pbf_path)
 
             # 建物取得（指定タグ）
-            buildings = osm.get_buildings(custom_filter={"tags_as_columns": ["building:material"]})
+            buildings = osm.get_buildings(custom_filter = {"tags_as_columns": tags_to_check})
             print(f"    → Total buildings in file: {len(buildings)}", flush=True)
 
             # 空間インデックスでフィルタ
