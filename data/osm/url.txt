@@ -1,4 +1,11 @@
-https://download.geofabrik.de/asia/indonesia-latest.osm.pbf
-https://download.geofabrik.de/asia/nepal-latest.osm.pbf
-https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf
-https://download.geofabrik.de/central-america-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/alabama-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/arkansas-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/california-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/florida-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/hawaii-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/kansas-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/missouri-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/north-carolina-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/oklahoma-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/south-carolina-latest.osm.pbf
+https://download.geofabrik.de/north-america/us/texas-latest.osm.pbf
