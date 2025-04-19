@@ -1,0 +1,98 @@
+nohup: ignoring input
+Create dir
+
+🚧 Starting processing for: santa-rosa-wildfire
+  📦 Loading california-latest.osm.pbf...
+    → Total buildings in file: 40232
+    ✅ 176 buildings matched in bbox
+🎉 santa-rosa-wildfire: Saved 176 buildings to CSV in 2656.22 sec
+
+🚧 Starting processing for: hurricane-michael
+  📦 Loading florida-latest.osm.pbf...
+    → Total buildings in file: 5964
+    ✅ 113 buildings matched in bbox
+🎉 hurricane-michael: Saved 113 buildings to CSV in 1843.94 sec
+
+🚧 Starting processing for: hurricane-florence
+  📦 Loading north-carolina-latest.osm.pbf...
+    → Total buildings in file: 1942
+    ✅ 51 buildings matched in bbox
+  📦 Loading south-carolina-latest.osm.pbf...
+    → Total buildings in file: 764
+    ✅ 44 buildings matched in bbox
+🎉 hurricane-florence: Saved 95 buildings to CSV in 1985.94 sec
+
+🚧 Starting processing for: hurricane-harvey
+  📦 Loading texas-latest.osm.pbf...
+    → Total buildings in file: 6413
+    ✅ 731 buildings matched in bbox
+🎉 hurricane-harvey: Saved 731 buildings to CSV in 1470.56 sec
+
+🚧 Starting processing for: midwest-flooding
+  📦 Loading arkansas-latest.osm.pbf...
+    → Total buildings in file: 389
+    ✅ 289 buildings matched in bbox
+  📦 Loading missouri-latest.osm.pbf...
+    → Total buildings in file: 788
+    ✅ 1 buildings matched in bbox
+  📦 Loading kansas-latest.osm.pbf...
+    → Total buildings in file: 495
+    ✅ 0 buildings matched in bbox
+🎉 midwest-flooding: Saved 290 buildings to CSV in 805.56 sec
+
+🚧 Starting processing for: socal-fire
+  📦 Loading california-latest.osm.pbf...
+    → Total buildings in file: 40232
+    ✅ 318 buildings matched in bbox
+🎉 socal-fire: Saved 318 buildings to CSV in 3657.48 sec
+
+🚧 Starting processing for: joplin-tornado
+  📦 Loading missouri-latest.osm.pbf...
+    → Total buildings in file: 788
+    ✅ 2 buildings matched in bbox
+🎉 joplin-tornado: Saved 2 buildings to CSV in 825.04 sec
+
+🚧 Starting processing for: lower-puna-volcano
+  📦 Loading hawaii-latest.osm.pbf...
+    → Total buildings in file: 335
+    ✅ 0 buildings matched in bbox
+🎉 lower-puna-volcano: Saved 0 buildings to CSV in 107.49 sec
+
+🚧 Starting processing for: woolsey-fire
+  📦 Loading california-latest.osm.pbf...
+    → Total buildings in file: 40232
+    ✅ 264 buildings matched in bbox
+🎉 woolsey-fire: Saved 264 buildings to CSV in 2643.63 sec
+
+🚧 Starting processing for: tuscaloosa-tornado
+  📦 Loading alabama-latest.osm.pbf...
+    → Total buildings in file: 709
+    ✅ 59 buildings matched in bbox
+🎉 tuscaloosa-tornado: Saved 59 buildings to CSV in 569.39 sec
+
+🚧 Starting processing for: moore-tornado
+  📦 Loading oklahoma-latest.osm.pbf...
+    → Total buildings in file: 633
+    ✅ 2 buildings matched in bbox
+🎉 moore-tornado: Saved 2 buildings to CSV in 254.38 sec
+
+🚧 Starting processing for: mexico-earthquake
+  📦 Loading mexico-latest.osm.pbf...
+    → Total buildings in file: 9765
+    ✅ 506 buildings matched in bbox
+🎉 mexico-earthquake: Saved 506 buildings to CSV in 1279.40 sec
+
+🚧 Starting processing for: portugal-wildfire
+  📦 Loading portugal-latest.osm.pbf...
+    → Total buildings in file: 5712
+    ✅ 6 buildings matched in bbox
+🎉 portugal-wildfire: Saved 6 buildings to CSV in 1236.30 sec
+
+🚧 Starting processing for: nepal-flooding
+  📦 Loading nepal-latest.osm.pbf...
+    → Total buildings in file: 2048
+    ✅ 0 buildings matched in bbox
+🎉 nepal-flooding: Saved 0 buildings to CSV in 1189.34 sec
+
+🚧 Starting processing for: sunda-tsunami
+  📦 Loading indonesia-latest.osm.pbf...
