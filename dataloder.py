@@ -27,21 +27,25 @@ class DamageDataset(Dataset):
         if img is None:
             raise RuntimeError(f"❌ Failed to load image: {path}")
 
+        # 高ビット画像（int16, float32など）を 8bit に正規化して変換
+        if img.dtype != np.uint8:
+            img = cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX)
+            img = img.astype(np.uint8)
+
         # グレースケール → RGB化
         if len(img.shape) == 2:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-        # RGBA → RGB
         elif img.shape[2] == 4:
             img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-        # BGR → RGB
         else:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         img = cv2.resize(img, (self.image_size, self.image_size))
-        img = img.astype(np.float32) / 255.0  # [0, 1]
+        img = img.astype(np.float32) / 255.0
         img = torch.tensor(img).permute(2, 0, 1)  # (H, W, C) → (C, H, W)
 
         return img
+
 
     def __getitem__(self, idx):
         image_path = self.image_paths[idx]
