@@ -112,7 +112,7 @@ def process_disasters_from_mixed_labels(tier1_label_dir, tier3_label_dir, osm_ro
 if __name__ == "__main__":
     tier1_label_dir = "/mnt/bigdisk/xbd/geotiffs/tier1/labels"
     tier3_label_dir = "/mnt/bigdisk/xbd/geotiffs/tier3/labels"
-    osm_root = "~/project/ADL-project/output"
-    output_dir = "~/project/ADL-project/matching"
+    osm_root = "./output"
+    output_dir = "./matching"
 
     process_disasters_from_mixed_labels(tier1_label_dir, tier3_label_dir, osm_root, output_dir)
