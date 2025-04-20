@@ -1,0 +1,118 @@
+import os
+import json
+import pandas as pd
+import geopandas as gpd
+from shapely import wkt
+from tqdm import tqdm
+from collections import defaultdict
+
+def load_xbd_lnglat_geojson_from_files(json_files):
+    all_records = []
+
+    for fpath in json_files:
+        fname = os.path.basename(fpath)
+        with open(fpath, "r") as f:
+            data = json.load(f)
+
+        features = data.get("features", {}).get("lng_lat", [])
+        for feature in features:
+            props = feature["properties"]
+            geom = wkt.loads(feature["wkt"])
+            all_records.append({
+                "geometry": geom,
+                "subtype": props.get("subtype"),
+                "uid": props.get("uid"),
+                "file": fname
+            })
+
+    gdf = gpd.GeoDataFrame(all_records, crs="EPSG:4326")
+    return gdf
+
+def load_osm_csv(csv_path):
+    df = pd.read_csv(csv_path)
+    df = df[df["geometry"].notnull()]
+    df["geometry"] = df["geometry"].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
+    if "building:material" in gdf.columns:
+        gdf = gdf[gdf["building:material"].notnull()]
+    return gdf
+
+def match_buildings_by_centroid(xbd_gdf, osm_gdf, threshold=50):
+    utm_crs = xbd_gdf.estimate_utm_crs()
+    xbd_proj = xbd_gdf.to_crs(utm_crs)
+    osm_proj = osm_gdf.to_crs(utm_crs)
+
+    xbd_proj["centroid"] = xbd_proj.geometry.centroid
+    osm_proj["centroid"] = osm_proj.geometry.centroid
+
+    matches = []
+    for i, xbd_row in tqdm(xbd_proj.iterrows(), total=len(xbd_proj), desc="Matching buildings"):
+        xbd_centroid = xbd_row["centroid"]
+        nearby = osm_proj[osm_proj["centroid"].distance(xbd_centroid) < threshold]
+        if not nearby.empty:
+            nearest = nearby.iloc[0]
+            matches.append({
+                "xbd_index": i,
+                "material": nearest["building:material"],
+                "distance": xbd_centroid.distance(nearest["centroid"])
+            })
+
+    matches_df = pd.DataFrame(matches)
+    xbd_gdf["material"] = None
+    for _, row in matches_df.iterrows():
+        xbd_gdf.at[row["xbd_index"], "material"] = row["material"]
+
+    return xbd_gdf
+
+def summarize_damage_by_material(xbd_gdf):
+    summary = xbd_gdf.groupby(["subtype", "material"]).size().reset_index(name="count")
+    return summary
+
+def collect_label_files_by_disaster(tier1_label_dir, tier3_label_dir):
+    disaster_files = defaultdict(list)
+    for label_dir in [tier1_label_dir, tier3_label_dir]:
+        if not os.path.isdir(label_dir):
+            continue
+        for fname in os.listdir(label_dir):
+            if not fname.endswith(".json"):
+                continue
+            disaster = fname.split("_")[0]  # e.g., hurricane-florence
+            full_path = os.path.join(label_dir, fname)
+            disaster_files[disaster].append(full_path)
+    return disaster_files
+
+def process_disasters_from_mixed_labels(tier1_label_dir, tier3_label_dir, osm_root, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    disaster_files = collect_label_files_by_disaster(tier1_label_dir, tier3_label_dir)
+
+    for disaster, file_list in disaster_files.items():
+        osm_csv = os.path.join(osm_root, f"{disaster}_osm_buildings.csv")
+        output_csv = os.path.join(output_dir, f"{disaster}_summary.csv")
+
+        if not os.path.exists(osm_csv):
+            print(f"❌ Skipping {disaster}: OSM CSV not found")
+            continue
+
+        print(f"\n📦 Processing disaster: {disaster}")
+        try:
+            xbd_gdf = load_xbd_lnglat_geojson_from_files(file_list)
+            osm_gdf = load_osm_csv(osm_csv)
+
+            print(f"🏗️ xBD buildings: {len(xbd_gdf)}, OSM buildings: {len(osm_gdf)}")
+
+            xbd_gdf = match_buildings_by_centroid(xbd_gdf, osm_gdf)
+            summary_df = summarize_damage_by_material(xbd_gdf)
+
+            summary_df.to_csv(output_csv, index=False)
+            print(f"✅ Summary saved: {output_csv}")
+        except Exception as e:
+            print(f"⚠️ Error processing {disaster}: {e}")
+
+# === 実行 ===
+if __name__ == "__main__":
+    tier1_label_dir = "/mnt/bigdisk/xbd/geotiffs/tier1/labels"
+    tier3_label_dir = "/mnt/bigdisk/xbd/geotiffs/tier3/labels"
+    osm_root = "~/project/ADL-project/output"
+    output_dir = "~/project/ADL-project/matching"
+
+    process_disasters_from_mixed_labels(tier1_label_dir, tier3_label_dir, osm_root, output_dir)
