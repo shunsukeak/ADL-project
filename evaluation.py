@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader
 from dataloader import DamageDataset
-from model import MultimodalDamageClassifier  # モデル定義ファイル
+from train_model import MultimodalDamageClassifier  # モデル定義ファイル
 import pandas as pd
 
 # データ準備
