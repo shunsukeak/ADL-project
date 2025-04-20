@@ -1,8 +1,33 @@
 import torch
 from torch.utils.data import DataLoader
 from dataloader import DamageDataset
-from train_model import MultimodalDamageClassifier  # モデル定義ファイル
+from train_model import MultimodalDamageClassifier  
 import pandas as pd
+from sklearn.metrics import classification_report, confusion_matrix
+import numpy as np
+
+def evaluate_with_metrics(model, loader, device, class_names=None):
+    model.eval()
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for images, attrs, labels in loader:
+            images, attrs = images.to(device), attrs.to(device)
+            outputs = model(images, attrs)
+            preds = torch.argmax(outputs, dim=1)
+
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+
+    all_preds = np.array(all_preds)
+    all_labels = np.array(all_labels)
+
+    print("✅ Classification Report:")
+    print(classification_report(all_labels, all_preds, target_names=class_names))
+
+    print("🧾 Confusion Matrix:")
+    print(confusion_matrix(all_labels, all_preds))
 
 # データ準備
 csv_path = "./training_dataset_with_labels_and_features.csv"
