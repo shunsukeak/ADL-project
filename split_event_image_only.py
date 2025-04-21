@@ -1,7 +1,7 @@
 import pandas as pd
 import random
 
-df = pd.read_csv("resnet_baseline/training_dataset_image_only.csv")
+df = pd.read_csv("./training_dataset_image_only.csv")
 df["disaster"] = df["file"].apply(lambda x: x.split("_")[0])
 
 all_disasters = sorted(df["disaster"].unique())
