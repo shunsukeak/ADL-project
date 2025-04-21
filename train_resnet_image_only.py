@@ -19,6 +19,8 @@ class ImageOnlyDataset(Dataset):
         self.labels = self.df["label"].tolist()
         self.image_size = image_size
         self.transform = transform
+        print(f"📦 Loaded dataset from {csv_path}")
+        print(f"   - Total samples: {len(self.df)}")
 
     def __len__(self):
         return len(self.df)
@@ -61,7 +63,6 @@ class ResNetOnlyClassifier(nn.Module):
     def forward(self, image):
         feat = self.resnet(image).squeeze()
         return self.classifier(feat)
-
 # === Training Loop ===
 def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4):
     model = model.to(device)
@@ -71,10 +72,13 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4)
     train_losses, val_accuracies = [], []
     all_preds, all_labels = [], []
 
+    print(f"\n🚀 Starting training for {num_epochs} epochs...\n")
+
     for epoch in range(num_epochs):
         model.train()
         total_loss, correct, total = 0, 0, 0
-        for images, labels in train_loader:
+        print(f"🟢 Epoch {epoch+1}/{num_epochs}")
+        for i, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(images)
@@ -87,18 +91,24 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
 
+            if (i + 1) % 10 == 0:
+                print(f"   - Batch {i+1}: loss={loss.item():.4f}")
+
         train_acc = correct / total
         train_losses.append(total_loss)
-        print(f"Epoch {epoch+1}: Train Loss={total_loss:.4f}, Train Acc={train_acc:.4f}")
+        print(f"✅ Epoch {epoch+1}: Train Loss={total_loss:.4f}, Train Acc={train_acc:.4f}")
 
+        print(f"🔍 Running validation for epoch {epoch+1}...")
         val_acc, preds, labels = evaluate(model, val_loader, device)
         val_accuracies.append(val_acc)
         all_preds, all_labels = preds, labels
+        print(f"✅ Validation Acc={val_acc:.4f}")
 
     torch.save(model.state_dict(), "resnet_only_model.pt")
-    print("✅ Model saved: resnet_only_model.pt")
+    print("💾 Model saved: resnet_only_model.pt")
 
     # === Training Curve ===
+    print("📉 Plotting training curve...")
     plt.figure()
     plt.plot(range(1, num_epochs + 1), train_losses, label="Train Loss")
     plt.plot(range(1, num_epochs + 1), val_accuracies, label="Val Accuracy")
@@ -107,9 +117,10 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4)
     plt.title("Training Curve")
     plt.legend()
     plt.savefig("training_curve.png")
-    print("📉 Saved training_curve.png")
+    print("✅ Saved: training_curve.png")
 
     # === Confusion Matrix ===
+    print("📊 Generating confusion matrix...")
     cm = confusion_matrix(all_labels, all_preds)
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
@@ -119,14 +130,14 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4)
     plt.ylabel("True")
     plt.title("Confusion Matrix")
     plt.savefig("confusion_matrix.png")
-    print("📊 Saved confusion_matrix.png")
+    print("✅ Saved: confusion_matrix.png")
 
     # === Classification Report ===
     report = classification_report(all_labels, all_preds,
                                    target_names=["no", "minor", "major", "destroyed"])
     with open("val_report.txt", "w") as f:
         f.write(report)
-    print("📄 Saved val_report.txt")
+    print("📄 Saved: val_report.txt")
 
 def evaluate(model, loader, device):
     model.eval()
@@ -142,7 +153,6 @@ def evaluate(model, loader, device):
             correct += (preds == labels).sum().item()
             total += labels.size(0)
     acc = correct / total
-    print(f"🧪 Val Accuracy: {acc:.4f}")
     return acc, all_preds, all_labels
 
 # === Main ===
