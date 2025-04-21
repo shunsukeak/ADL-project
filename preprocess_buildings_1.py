@@ -53,13 +53,17 @@ def match_buildings_by_centroid(xbd_gdf, osm_gdf, threshold=50):
     return xbd_gdf
 
 def impute_missing_attributes(xbd_gdf, attr_cols, radius=50):
-    utm = xbd_gdf.estimate_utm_crs()
-    gdf_proj = xbd_gdf.to_crs(utm)
+    print(f"🔍 Imputing missing attributes within {radius}m radius...")
+    utm_crs = xbd_gdf.estimate_utm_crs()
+    gdf_proj = xbd_gdf.to_crs(utm_crs)
     gdf_proj["centroid"] = gdf_proj.geometry.centroid
     coords = np.array([(p.x, p.y) for p in gdf_proj["centroid"]])
     tree = KDTree(coords)
+
     unknown_summary = {col: 0 for col in attr_cols}
-    for idx, row in gdf_proj.iterrows():
+    total = len(gdf_proj)
+
+    for idx, row in tqdm(gdf_proj.iterrows(), total=total, desc="🔄 Attribute imputation"):
         for col in attr_cols:
             if pd.isna(row.get(col)) or row[col] in ["", "nan", None]:
                 dists, indices = tree.query_radius([coords[idx]], r=radius, return_distance=True)
@@ -70,8 +74,12 @@ def impute_missing_attributes(xbd_gdf, attr_cols, radius=50):
                 else:
                     gdf_proj.at[idx, col] = "unknown"
                     unknown_summary[col] += 1
+
+    print("📊 Unknown attribute ratio after imputation:")
     for col in attr_cols:
-        print(f"🧮 {col} unknown: {unknown_summary[col]} / {len(gdf_proj)}")
+        ratio = unknown_summary[col] / total
+        print(f" - {col}: {unknown_summary[col]} / {total} = {ratio:.2%}")
+
     return gdf_proj.to_crs("EPSG:4326")
 
 def collect_label_files(tier1_dir, tier3_dir):
@@ -86,18 +94,54 @@ def collect_label_files(tier1_dir, tier3_dir):
 def process_all_disasters(tier1_dir, tier3_dir, osm_root, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     attr_cols = ["building", "building:material", "building:levels"]
-    for disaster, file_list in collect_label_files(tier1_dir, tier3_dir).items():
+    from collections import defaultdict
+
+    disaster_files = defaultdict(list)
+    for label_dir in [tier1_dir, tier3_dir]:
+        for fname in os.listdir(label_dir):
+            if fname.endswith(".json"):
+                disaster = fname.split("_")[0]
+                disaster_files[disaster].append(os.path.join(label_dir, fname))
+
+    for disaster, file_list in disaster_files.items():
+        print(f"\n📦 Processing disaster: {disaster}")
         osm_csv = os.path.join(osm_root, f"{disaster}_osm_buildings.csv")
         out_csv = os.path.join(output_dir, f"{disaster}_enriched.csv")
+
         if not os.path.exists(osm_csv):
-            print(f"❌ No OSM for {disaster}")
+            print(f"❌ OSM CSV not found for {disaster} – skipping.")
             continue
-        xbd_gdf = load_xbd_lnglat_geojson_from_files(file_list)
-        osm_gdf = load_osm_csv(osm_csv)
-        xbd_gdf = match_buildings_by_centroid(xbd_gdf, osm_gdf)
-        xbd_gdf = impute_missing_attributes(xbd_gdf, attr_cols)
-        xbd_gdf.to_csv(out_csv, index=False)
-        print(f"✅ Saved: {out_csv}")
+
+        try:
+            xbd_gdf = load_xbd_lnglat_geojson_from_files(file_list)
+            osm_gdf = load_osm_csv(osm_csv)
+
+            print(f"🏗️ xBD buildings: {len(xbd_gdf)}, OSM buildings: {len(osm_gdf)}")  # ← この行を追加！
+
+            xbd_gdf = match_buildings_by_centroid(xbd_gdf, osm_gdf)
+            xbd_gdf = impute_missing_attributes(xbd_gdf, attr_cols)
+
+            xbd_gdf.to_csv(out_csv, index=False)
+            print(f"✅ Saved enriched CSV: {out_csv}")
+
+        except Exception as e:
+            print(f"⚠️ Error processing {disaster}: {e}")
+
+# def process_all_disasters(tier1_dir, tier3_dir, osm_root, output_dir):
+#     os.makedirs(output_dir, exist_ok=True)
+#     attr_cols = ["building", "building:material", "building:levels"]
+#     for disaster, file_list in collect_label_files(tier1_dir, tier3_dir).items():
+#         osm_csv = os.path.join(osm_root, f"{disaster}_osm_buildings.csv")
+#         out_csv = os.path.join(output_dir, f"{disaster}_enriched.csv")
+#         if not os.path.exists(osm_csv):
+#             print(f"❌ No OSM for {disaster}")
+#             continue
+#         xbd_gdf = load_xbd_lnglat_geojson_from_files(file_list)
+#         osm_gdf = load_osm_csv(osm_csv)
+#         xbd_gdf = match_buildings_by_centroid(xbd_gdf, osm_gdf)
+#         xbd_gdf = impute_missing_attributes(xbd_gdf, attr_cols)
+#         xbd_gdf.to_csv(out_csv, index=False)
+#         print(f"✅ Saved: {out_csv}")
 
 if __name__ == "__main__":
     process_all_disasters(
