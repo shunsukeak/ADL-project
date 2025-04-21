@@ -7,6 +7,7 @@ from train_model_5 import train_model, MultimodalDamageClassifier
 import pandas as pd
 from torch.utils.data import DataLoader, random_split
 import torch
+import random
 
 # === ファイルパス設定 ===
 tier1_label_dir = "/mnt/bigdisk/xbd/geotiffs/tier1/labels"
