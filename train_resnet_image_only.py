@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from tqdm import tqdm
 from sklearn.metrics import confusion_matrix, classification_report
 
 # === Dataset: Image only ===
@@ -77,8 +78,9 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4)
     for epoch in range(num_epochs):
         model.train()
         total_loss, correct, total = 0, 0, 0
-        print(f"🟢 Epoch {epoch+1}/{num_epochs}")
-        for i, (images, labels) in enumerate(train_loader):
+        print(f"\n🟢 Epoch {epoch+1}/{num_epochs}")
+        
+        for images, labels in tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}"):
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(images)
@@ -90,9 +92,6 @@ def train_model(model, train_loader, val_loader, device, num_epochs=10, lr=1e-4)
             preds = torch.argmax(outputs, dim=1)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
-
-            if (i + 1) % 10 == 0:
-                print(f"   - Batch {i+1}: loss={loss.item():.4f}")
 
         train_acc = correct / total
         train_losses.append(total_loss)
