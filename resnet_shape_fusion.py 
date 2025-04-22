@@ -1,5 +1,6 @@
 # === resnet_shape_fusion.py ===
 # 統合構成: 画像 (ResNet) + 形状特徴 (MLP) → 被害分類
+# cropしたものを利用
 
 import torch
 import torch.nn as nn
@@ -99,8 +100,8 @@ def train(model, train_loader, val_loader, device, epochs=10):
         val_accuracies.append(acc)
 
     # Plot & Save
-    torch.save(model.state_dict(), "model_shape_fusion.pt")
-    print("✅ Model saved: model_shape_fusion.pt")
+    torch.save(model.state_dict(), "crop_model_shape_fusion.pt")
+    print("✅ Model saved: crop_model_shape_fusion.pt")
     plot_results(train_losses, val_accuracies)
     save_report(gts, preds)
 
@@ -129,25 +130,25 @@ def plot_results(losses, accs):
     plt.plot(accs, label="Val Acc")
     plt.legend()
     plt.title("Training Curve")
-    plt.savefig("training_curve.png")
-    print("📈 Saved: training_curve.png")
+    plt.savefig("crop_training_curve.png")
+    print("📈 Saved: crop_training_curve.png")
 
 def save_report(y_true, y_pred):
     labels = ["no", "minor", "major", "destroyed"]
     cm = confusion_matrix(y_true, y_pred)
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
     plt.title("Confusion Matrix")
-    plt.savefig("confusion_matrix.png")
-    print("📊 Saved: confusion_matrix.png")
-    with open("val_report.txt", "w") as f:
+    plt.savefig("crop_confusion_matrix.png")
+    print("📊 Saved: crop_confusion_matrix.png")
+    with open("crop_val_report.txt", "w") as f:
         f.write(classification_report(y_true, y_pred, target_names=labels))
-    print("📄 Saved: val_report.txt")
+    print("📄 Saved: crop_val_report.txt")
 
 # === Entry ===
 if __name__ == "__main__":
     csv = "cropped_dataset_with_shapes.csv"
     df = pd.read_csv(csv)
-    df["disaster"] = df["file"].apply(lambda x: x.split("_")[0])  # 災害名を抽出
+    df["disaster"] = df["image_path"].apply(lambda x: x.split("_")[0])  # 災害名を抽出 file -> image path
     all_events = sorted(df["disaster"].unique())
     random.seed(42)
     random.shuffle(all_events)
@@ -159,11 +160,11 @@ if __name__ == "__main__":
     train_df = df[df["disaster"].isin(train_events)].reset_index(drop=True)
     val_df = df[df["disaster"].isin(val_events)].reset_index(drop=True)
 
-    train_df.to_csv("train_event_split.csv", index=False)
-    val_df.to_csv("val_event_split.csv", index=False)
+    train_df.to_csv("crop_train_event_split.csv", index=False)
+    val_df.to_csv("crop_val_event_split.csv", index=False)
 
-    train_loader = DataLoader(ShapeFusionDataset("train_event_split.csv"), batch_size=32, shuffle=True)
-    val_loader = DataLoader(ShapeFusionDataset("val_event_split.csv"), batch_size=32)
+    train_loader = DataLoader(ShapeFusionDataset("crop_train_event_split.csv"), batch_size=32, shuffle=True)
+    val_loader = DataLoader(ShapeFusionDataset("crop_val_event_split.csv"), batch_size=32)
 
     model = ResNetWithShape(shape_feat_dim=5)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
