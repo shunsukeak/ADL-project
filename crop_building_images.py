@@ -8,6 +8,7 @@
 import os
 import json
 import rasterio
+from rasterio import mask
 from rasterio.features import geometry_mask
 import geopandas as gpd
 from shapely import wkt
@@ -20,7 +21,8 @@ import pandas as pd
 def crop_polygon_from_image(image_path, polygon, out_path):
     with rasterio.open(image_path) as src:
         try:
-            out_image, out_transform = rasterio.mask.mask(src, [mapping(polygon)], crop=True)
+            # out_image, out_transform = rasterio.mask.mask(src, [mapping(polygon)], crop=True)
+            out_image, out_transform = mask.mask(src, [mapping(polygon)], crop=True)
             out_meta = src.meta.copy()
 
             out_meta.update({
