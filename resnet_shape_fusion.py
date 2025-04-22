@@ -14,6 +14,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import os
 
 # === Dataset: 画像 + 数値特徴 ===
 class ShapeFusionDataset(Dataset):
@@ -148,7 +149,8 @@ def save_report(y_true, y_pred):
 if __name__ == "__main__":
     csv = "cropped_dataset_with_shapes.csv"
     df = pd.read_csv(csv)
-    df["disaster"] = df["file"].apply(lambda x: x.split("_")[0])  # 災害名を抽出 file -> image path
+    # df["disaster"] = df["file"].apply(lambda x: x.split("_")[0])  # 災害名を抽出 file -> image path
+    df["disaster"] = df["image_path"].apply(lambda x: os.path.basename(x).split("_")[0])
     all_events = sorted(df["disaster"].unique())
     random.seed(42)
     random.shuffle(all_events)
