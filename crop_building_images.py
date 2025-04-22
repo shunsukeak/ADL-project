@@ -18,13 +18,34 @@ import pandas as pd
 import pyproj
 from shapely.ops import transform
 from functools import partial
+from pyproj import Transformer
+from shapely.geometry import box
 
 # === Utility: reproject polygon from EPSG:4326 to image CRS ===
+# def reproject_polygon(polygon, src_crs, dst_crs):
+#     project = partial(pyproj.transform, pyproj.CRS(src_crs), pyproj.CRS(dst_crs))
+#     return transform(project, polygon)
 def reproject_polygon(polygon, src_crs, dst_crs):
-    project = partial(pyproj.transform, pyproj.CRS(src_crs), pyproj.CRS(dst_crs))
+    transformer = Transformer.from_crs(src_crs, dst_crs, always_xy=True)
+    project = lambda x, y: transformer.transform(x, y)
     return transform(project, polygon)
 
 # === Utility: crop polygon area from tif ===
+# def crop_polygon_from_image(image_path, polygon, out_path):
+#     with rasterio.open(image_path) as src:
+#         try:
+#             if not polygon.is_valid:
+#                 print("⚠️ Invalid polygon, skipping")
+#                 return False
+
+#             # 画像のCRSにポリゴンを変換
+#             reprojected_polygon = reproject_polygon(polygon, "EPSG:4326", src.crs)
+
+#             # Debug (optional)
+#             # print("Image bounds:", src.bounds)
+#             # print("Polygon bounds:", reprojected_polygon.bounds)
+
+#             out_image, out_transform = mask.mask(src, [mapping(reprojected_polygon)], crop=True)
 def crop_polygon_from_image(image_path, polygon, out_path):
     with rasterio.open(image_path) as src:
         try:
@@ -32,13 +53,16 @@ def crop_polygon_from_image(image_path, polygon, out_path):
                 print("⚠️ Invalid polygon, skipping")
                 return False
 
-            # 画像のCRSにポリゴンを変換
+            # 再投影
             reprojected_polygon = reproject_polygon(polygon, "EPSG:4326", src.crs)
 
-            # Debug (optional)
-            # print("Image bounds:", src.bounds)
-            # print("Polygon bounds:", reprojected_polygon.bounds)
+            # バウンディングボックス同士の空間的交差チェック
+            img_bounds = box(*src.bounds)
+            if not reprojected_polygon.intersects(img_bounds):
+                print("⚠️ Polygon does not intersect image bounds, skipping")
+                return False
 
+            # crop
             out_image, out_transform = mask.mask(src, [mapping(reprojected_polygon)], crop=True)
             out_meta = src.meta.copy()
             out_meta.update({
